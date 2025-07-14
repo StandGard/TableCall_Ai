@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TableTalk AI - Your AI Phone Assistant for Restaurants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+        }
+
+        .btn-secondary:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff" fill-opacity="0.05" points="0,200 300,100 600,300 1000,0 1000,1000 0,1000"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #1a1a1a;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .feature:hover {
+            background: #f8fafc;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Contact Form Styles */
+        .contact {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+
+        .contact-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #2563eb;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .form-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .form-message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+
+        .form-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }
+
+        .form-errors {
+            margin-top: 1rem;
+        }
+
+        .form-errors ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .form-errors li {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #f87171;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .contact-form {
+                padding: 2rem;
+                margin: 0 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease-out;
+        }
+
+        section {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* Additional styles from original file */
+        .testimonials {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: #4b5563;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .pricing {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .pricing-card.popular {
+            border-color: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .demo {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .demo-phone {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            color: #fbbf24;
+        }
+
+        .benefits {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .benefit {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .benefit-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .benefit h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#" class="logo">TableTalk AI</a>
+            <ul class="nav-links">
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#demo">Demo</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="container">
+                <h1>Never Miss Another Reservation</h1>
+                <p>TableTalk AI answers your restaurant's phone calls 24/7, takes bookings, and handles customer questions so your team can focus on what they do best.</p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn btn-primary">Get Started Today</a>
+                    <a href="#demo" class="btn btn-secondary">Try the Demo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How TableTalk AI Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Quick Setup</h3>
+                    <p>We configure TableTalk AI with your restaurant's details, menu, and booking system in under 30 minutes.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Phone Integration</h3>
+                    <p>Connect your existing phone number to our AI system. No new hardware needed.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>AI Takes Over</h3>
+                    <p>TableTalk AI answers calls, takes bookings, and handles common questions automatically.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Everything You Need</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">📞</div>
+                    <div>
+                        <h3>24/7 Phone Answering</h3>
+                        <p>Never miss a call again. TableTalk AI is always available to take bookings.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📅</div>
+                    <div>
+                        <h3>Automatic Booking System</h3>
+                        <p>AI checks availability and books tables directly in your calendar system.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💬</div>
+                    <div>
+                        <h3>Common Questions Handled</h3>
+                        <p>Hours, location, menu items, and special requests answered instantly.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <div>
+                        <h3>Booking Analytics</h3>
+                        <p>Track call volume, booking patterns, and customer preferences.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔧</div>
+                    <div>
+                        <h3>Easy Integration</h3>
+                        <p>Works with your existing phone system and reservation software.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎙️</div>
+                    <div>
+                        <h3>Natural Conversations</h3>
+                        <p>Advanced AI that sounds natural and handles complex requests.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">Why Restaurants Love TableTalk AI</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial">
+                    <p class="testimonial-text">Since installing TableTalk AI, our phones are always answered, and bookings have gone up 23%. Staff love it. Guests love it. It just works.</p>
+                    <p class="testimonial-author">— Maria G., Bella Vita London</p>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">TableTalk AI saved my team hours every week. We no longer need to stop service just to answer the phone.</p>
+                    <p class="testimonial-author">— Samir R., The Grove</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2 class="section-title">Simple Monthly Pricing — No Contracts</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Basic</h3>
+                    <div class="price">£49<span style="font-size: 1rem; font-weight: 400;">/mo</span></div>
+                    <ul class="pricing-features">
+                        <li>100 calls/month</li>
+                        <li>Booking logs</li>
+                        <li>FAQ handling</li>
+                        <li>Google Calendar sync</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary">Start Free Trial</a>
+                </div>
+                <div class="pricing-card popular">
+                    <h3>Pro</h3>
+                    <div class="price">£99<span style="font-size: 1rem; font-weight: 400;">/mo</span></div>
+                    <ul class="pricing-features">
+                        <li>500 calls/month</li>
+                        <li>SMS confirmations</li>
+                        <li>Custom voice branding</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary">Start Free Trial</a>
+                </div>
+                <div class="pricing-card">
+                    <h3>Premium</h3>
+                    <div class="price">£149<span style="font-size: 1rem; font-weight: 400;">/mo</span></div>
+                    <ul class="pricing-features">
+                        <li>Unlimited calls</li>
+                        <li>Multilingual support</li>
+                        <li>CRM sync</li>
+                        <li>Dashboard analytics</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary">Start Free Trial</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo" id="demo">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">Want to Hear It in Action?</h2>
+            <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">Call our demo line and speak to TableTalk AI.</p>
+            <div class="demo-phone">+44 7777 000000</div>
+            <a href="tel:+447777000000" class="btn btn-primary">Try the Demo</a>
+        </div>
+    </section>
+
+    <section class="benefits">
+        <div class="container">
+            <h2 class="section-title">Built for Restaurant Owners</h2>
+            <div class="benefits-grid">
+                <div class="benefit">
+                    <div class="benefit-icon">📞</div>
+                    <h3>Prevent missed reservations</h3>
+                    <p>Never lose a booking due to busy lines or staff availability</p>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">⏰</div>
+                    <h3>Save time for your team</h3>
+                    <p>Free up staff to focus on serving customers instead of answering phones</p>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">🤖</div>
+                    <h3>Answer repetitive calls automatically</h3>
+                    <p>Handle common questions about hours, menu, and location instantly</p>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">✨</div>
+                    <h3>No apps, no learning curve</h3>
+                    <p>Works with your existing phone system — just phone calls</p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="#contact" class="btn btn-primary">Get Started Today</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 class="section-title">Get Started with TableTalk AI</h2>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Restaurant Owner Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="restaurant">Restaurant Name *</label>
+                    <input type="text" id="restaurant" name="restaurant" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" placeholder="07123 456789" required>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="trial" name="trial">
+                        <label for="trial">I want to start with a free trial</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="consent" name="consent_given" required>
+                        <label for="consent">I agree to be contacted about TableTalk AI services *</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="submitBtn">
+                        Request Setup
+                    </button>
+                </div>
+                <div id="formMessage" class="form-message" style="display: none;"></div>
+                <div id="formErrors" class="form-errors" style="display: none;"></div>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#about">About</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a>
+                <a href="#terms">Terms</a>
+                <a href="#privacy">Privacy</a>
+            </div>
+            <p>&copy; 2025 TableTalk AI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:3000';
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Form submission handler - CONNECTED TO BACKEND
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get form elements
+            const submitBtn = document.getElementById('submitBtn');
+            const formMessage = document.getElementById('formMessage');
+            const formErrors = document.getElementById('formErrors');
+            
+            // Clear previous messages
+            formMessage.style.display = 'none';
+            formErrors.style.display = 'none';
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                restaurant: document.getElementById('restaurant').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                trial: document.getElementById('trial').checked,
+                consent_given: document.getElementById('consent').checked
+            };
+            
+            try {
+                // Send to TableTalk AI Backend
+                const response = await fetch(`${API_BASE_URL}/api/contact`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Success message
+                    formMessage.className = 'form-message success';
+                    formMessage.textContent = '✅ ' + result.message;
+                    formMessage.style.display = 'block';
+                    
+                    // Reset form
+                    document.getElementById('contactForm').reset();
+                    
+                    // Smooth scroll to message
+                    formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                } else {
+                    // Error message
+                    formMessage.className = 'form-message error';
+                    formMessage.textContent = '❌ ' + result.message;
+                    formMessage.style.display = 'block';
+                    
+                    // Show validation errors if any
+                    if (result.errors && result.errors.length > 0) {
+                        const errorsList = document.createElement('ul');
+                        result.errors.forEach(error => {
+                            const li = document.createElement('li');
+                            li.textContent = `${error.field}: ${error.message}`;
+                            errorsList.appendChild(li);
+                        });
+                        formErrors.innerHTML = '';
+                        formErrors.appendChild(errorsList);
+                        formErrors.style.display = 'block';
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Network error:', error);
+                formMessage.className = 'form-message error';
+                formMessage.textContent = '❌ Network error. Please check if the backend server is running and try again.';
+                formMessage.style.display = 'block';
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Request Setup';
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Phone number formatting (UK format)
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Format as UK phone number
+            if (value.length > 0) {
+                if (value.startsWith('44')) {
+                    value = '+' + value;
+                } else if (value.startsWith('0')) {
+                    // UK local format
+                    if (value.length >= 11) {
+                        value = value.substring(0, 2) + ' ' + value.substring(2, 6) + ' ' + value.substring(6, 12);
+                    }
+                }
+            }
+            
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html> 

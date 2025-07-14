@@ -1,0 +1,23 @@
+services:
+  # Backend API Service
+  - type: web
+    name: tabletalk-ai-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: production
+      - key: PORT
+        value: 10000
+
+databases:
+  # PostgreSQL Database
+  - name: tabletalk-postgres
+    databaseName: tabletalk_ai
+    user: tabletalk_user
+    plan: free 

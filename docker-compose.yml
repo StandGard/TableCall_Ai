@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  # TableTalk AI Backend API
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: tabletalk-ai-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=tabletalk_ai
+      - DB_USER=tabletalk_user
+      - DB_PASSWORD=secure_password
+      - FROM_EMAIL=noreply@tabletalk.ai
+      - SALES_EMAIL=sales@tabletalk.ai
+      - APP_URL=http://localhost:3000
+      - JWT_SECRET=dev_jwt_secret_change_in_production
+      - SESSION_SECRET=dev_session_secret_change_in_production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tabletalk-network
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: tabletalk-postgres
+    environment:
+      POSTGRES_DB: tabletalk_ai
+      POSTGRES_USER: tabletalk_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - tabletalk-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tabletalk_user -d tabletalk_ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Redis (for session storage and caching)
+  redis:
+    image: redis:7-alpine
+    container_name: tabletalk-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tabletalk-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    command: redis-server --appendonly yes --requirepass redis_password
+
+  # pgAdmin (Database management - development only)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tabletalk-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@tabletalk.ai
+      PGADMIN_DEFAULT_PASSWORD: admin_password
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - tabletalk-network
+    restart: unless-stopped
+    profiles:
+      - dev
+
+# Named volumes for data persistence
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+# Network for inter-service communication
+networks:
+  tabletalk-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 
