@@ -184,7 +184,9 @@
 
         .form-group input[type="text"],
         .form-group input[type="email"],
-        .form-group input[type="tel"] {
+        .form-group input[type="tel"],
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e5e7eb;
@@ -193,10 +195,34 @@
             transition: border-color 0.3s ease;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="gray"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .helper-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            line-height: 1.4;
         }
 
         .checkbox-group {
@@ -303,7 +329,7 @@
 
     <section class="contact" id="contact">
         <div class="container">
-            <h2 class="section-title">Get Started with TableTalk AI</h2>
+            <h2 class="section-title">Get Started with TableTalk AI Integration</h2>
             <form class="contact-form" id="contactForm">
                 <div class="form-group">
                     <label for="name">Restaurant Owner Name *</label>
@@ -320,6 +346,61 @@
                 <div class="form-group">
                     <label for="phone">Phone Number *</label>
                     <input type="tel" id="phone" name="phone" placeholder="07123 456789" required>
+                </div>
+                
+                <!-- Integration Information Section -->
+                <div style="border-top: 2px solid #f3f4f6; margin: 2rem 0 1.5rem 0; padding-top: 1.5rem;">
+                    <h3 style="color: #1a1a1a; font-size: 1.25rem; margin-bottom: 1rem; font-weight: 600;">Integration Details</h3>
+                    <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1.5rem;">Help us understand your current setup so we can integrate TableTalk AI seamlessly with your existing systems.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="booking_app_platform">Do you currently use a table‑booking app or platform? *</label>
+                    <input type="text" id="booking_app_platform" name="booking_app_platform" placeholder="e.g., OpenTable, ResDiary, custom system" required>
+                    <div class="helper-text">Tell us the name of the app or system you use, or type 'none' if you don't use one.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="has_api">Do you have an API available for your current booking system? *</label>
+                    <select id="has_api" name="has_api" required>
+                        <option value="">Please select...</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="not_sure">Not Sure</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="database_type">What type of database does your current system use? *</label>
+                    <select id="database_type" name="database_type" required>
+                        <option value="">Please select...</option>
+                        <option value="mysql">MySQL</option>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="sql_server">SQL Server</option>
+                        <option value="not_sure">Not Sure</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration_preference">Would you prefer TableTalk AI to integrate directly with your database, or through your existing app's API? *</label>
+                    <select id="integration_preference" name="integration_preference" required>
+                        <option value="">Please select...</option>
+                        <option value="direct_database">Direct Database</option>
+                        <option value="api">API</option>
+                        <option value="not_sure">Not Sure</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="technical_contact">Who can we contact on your technical team for integration details? *</label>
+                    <input type="text" id="technical_contact" name="technical_contact" placeholder="Name, email, and/or phone number" required>
+                    <div class="helper-text">Name, email, and/or phone number of your technical contact.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="additional_notes">Any additional notes or special requirements?</label>
+                    <textarea id="additional_notes" name="additional_notes" placeholder="Tell us about any special requirements, integrations, or concerns..."></textarea>
                 </div>
                 <div class="form-group">
                     <div class="checkbox-group">
@@ -379,6 +460,12 @@
                 email: document.getElementById('email').value.trim(),
                 restaurant: document.getElementById('restaurant').value.trim(),
                 phone: document.getElementById('phone').value.trim(),
+                booking_app_platform: document.getElementById('booking_app_platform').value.trim(),
+                has_api: document.getElementById('has_api').value,
+                database_type: document.getElementById('database_type').value,
+                integration_preference: document.getElementById('integration_preference').value,
+                technical_contact: document.getElementById('technical_contact').value.trim(),
+                additional_notes: document.getElementById('additional_notes').value.trim(),
                 trial: document.getElementById('trial').checked,
                 consent_given: document.getElementById('consent').checked
             };
@@ -400,7 +487,7 @@
                 
                 if (result.success) {
                     formMessage.className = 'form-message success';
-                    formMessage.textContent = '✅ ' + result.message;
+                    formMessage.textContent = '✅ Thank you! We\'ve received your integration details and will be in touch soon.';
                     formMessage.style.display = 'block';
                     
                     // Reset form
