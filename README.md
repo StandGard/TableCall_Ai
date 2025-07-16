@@ -1,423 +1,351 @@
-# TableTalk AI Backend
+# 🍽️ TableTalk AI - Complete Project
 
-A professional Node.js/Express backend for the TableTalk AI restaurant phone management system. This backend handles contact form submissions, email automation, lead management, and provides analytics for the B2B SaaS platform.
+**TableTalk AI** is a B2B SaaS platform that provides AI-powered phone answering for restaurants. This repository contains both the frontend website and the backend API that powers the entire system.
 
-## 🚀 Features
+## 🏗️ Project Structure Overview
 
-- **Contact Form Processing**: Secure form submission with validation and duplicate prevention
-- **Email Automation**: Auto-response emails for customers and notifications for sales team
-- **Lead Management**: Track contact status, trial requests, and conversion analytics
-- **Security**: Rate limiting, CSRF protection, input sanitization, and comprehensive security headers
-- **GDPR Compliance**: Data retention policies, deletion requests, and consent tracking
-- **Analytics**: Contact form performance metrics and lead conversion tracking
-- **Health Monitoring**: Built-in health checks and error tracking with Sentry integration
+This is a **monorepo** containing both frontend and backend code:
 
-## 📋 Prerequisites
-
-- Node.js 18+ 
-- PostgreSQL 15+
-- npm or yarn package manager
-
-## 🛠️ Installation
-
-1. **Clone and setup**
-```bash
-git clone <repository-url>
-cd tabletalk-ai-backend
-npm install
+```
+TableCall_Ai/                          # Root repository
+├── 🌐 FRONTEND FILES                   # → Deployed to Netlify
+│   ├── public/index.html               # Main production frontend
+│   └── tabletalk-homepage-connected.html # Alternative frontend version
+│
+├── ⚙️ BACKEND FILES                    # → Deployed to Railway  
+│   ├── server.js                       # Main Express server
+│   ├── config/database.js              # Database configuration
+│   ├── routes/contact.js               # API endpoints
+│   ├── middleware/security.js          # CORS, security, rate limiting
+│   ├── services/emailService.js        # Email automation
+│   ├── models/ContactSubmission.js     # Data models
+│   ├── validation/contactValidation.js # Input validation
+│   ├── database/schema.sql             # Database schema
+│   ├── scripts/migrate.js              # Database migration tool
+│   └── tests/contact.test.js           # API tests
+│
+├── 🚀 DEPLOYMENT CONFIG
+│   ├── render.yaml                     # Railway/Render deployment config
+│   ├── Dockerfile                      # Docker configuration
+│   ├── docker-compose.yml              # Local Docker setup
+│   └── package.json                    # Node.js dependencies
+│
+└── 📚 DOCUMENTATION
+    ├── README.md                       # This file
+    ├── DEPLOYMENT.md                   # Deployment guide
+    ├── QUICKSTART.md                   # Quick setup guide
+    └── env.template                    # Environment variables template
 ```
 
-2. **Environment configuration**
-```bash
-# Copy the environment template
-cp env.template .env
+## 🌐 Live Deployments
 
-# Edit .env with your actual values
-nano .env
+- **Frontend**: https://tablecallai.netlify.app (Netlify)
+- **Backend API**: https://tabletalk-ai-backend-production.up.railway.app (Railway)
+- **GitHub Repo**: https://github.com/StandGard/TableCall_Ai
+
+## 🎯 How It All Works Together
+
+1. **Frontend** (Netlify) serves the restaurant landing page with contact form
+2. **Backend** (Railway) processes form submissions, sends emails, stores data
+3. **Database** (Railway PostgreSQL) stores contact submissions and analytics
+4. **Email Service** sends automated responses and sales notifications
+
+## 🌐 Frontend Development
+
+### Files & Structure
+```
+Frontend Files:
+├── public/index.html                   # 🎯 MAIN PRODUCTION FRONTEND
+└── tabletalk-homepage-connected.html   # Alternative version
 ```
 
-3. **Database setup**
-```bash
-# Create PostgreSQL database
-createdb tabletalk_ai
+### Making Frontend Changes
 
-# Run migrations
+1. **Edit the HTML file**:
+   ```bash
+   # For production changes, edit:
+   nano public/index.html
+   
+   # For testing/alternative version:
+   nano tabletalk-homepage-connected.html
+   ```
+
+2. **Test locally**:
+   ```bash
+   # Open in browser or use a local server
+   python3 -m http.server 8000
+   # Visit: http://localhost:8000/public/
+   ```
+
+3. **Deploy to Netlify**:
+   ```bash
+   git add public/index.html
+   git commit -m "Update frontend: description of changes"
+   git push
+   # Netlify auto-deploys from GitHub in ~2-3 minutes
+   ```
+
+### Frontend API Configuration
+The frontend is configured to call your Railway backend:
+```javascript
+const API_BASE_URL = 'https://tabletalk-ai-backend-production.up.railway.app';
+```
+
+## ⚙️ Backend Development
+
+### Files & Structure
+```
+Backend Files:
+├── server.js                          # Main Express application
+├── config/
+│   └── database.js                    # PostgreSQL connection
+├── routes/
+│   └── contact.js                     # API endpoints (/api/contact)
+├── middleware/
+│   └── security.js                    # CORS, rate limiting, security
+├── services/
+│   └── emailService.js                # Email automation (nodemailer)
+├── models/
+│   └── ContactSubmission.js           # Database models
+├── validation/
+│   └── contactValidation.js           # Input validation (Joi)
+├── database/
+│   └── schema.sql                     # Database schema
+├── scripts/
+│   └── migrate.js                     # Database migration tool
+└── tests/
+    └── contact.test.js                # API tests (Jest)
+```
+
+### Making Backend Changes
+
+1. **Local development setup**:
+   ```bash
+   # Install dependencies
+   npm install
+   
+   # Copy environment template
+   cp env.template .env
+   
+   # Edit environment variables
+   nano .env
+   
+   # Run database migration
+   npm run migrate -- --demo
+   
+   # Start development server
+   npm run dev
+   ```
+
+2. **Make your changes**:
+   ```bash
+   # Edit API routes
+   nano routes/contact.js
+   
+   # Edit database models  
+   nano models/ContactSubmission.js
+   
+   # Update security/CORS settings
+   nano middleware/security.js
+   ```
+
+3. **Test your changes**:
+   ```bash
+   # Run tests
+   npm test
+   
+   # Test API endpoints
+   curl http://localhost:3000/health
+   curl -X POST http://localhost:3000/api/contact -H "Content-Type: application/json" -d '{"name":"Test","email":"test@example.com","restaurant":"Test Restaurant","phone":"07123456789","consent_given":true}'
+   ```
+
+4. **Deploy to Railway**:
+   ```bash
+   git add .
+   git commit -m "Update backend: description of changes"
+   git push
+   # Railway auto-deploys from GitHub in ~3-5 minutes
+   ```
+
+## 📊 Database Management
+
+### Schema & Tables
+- **contact_submissions**: Stores form submissions
+- **demo_calls**: Tracks demo call requests
+- Includes indexes, triggers, and data retention policies
+
+### Database Operations
+```bash
+# Run migration (creates tables)
 npm run migrate
 
-# Optional: Add demo data
+# Add demo data
 npm run migrate -- --demo
+
+# Connect to production database (if needed)
+psql $DATABASE_URL
 ```
 
-4. **Start the server**
+## 🚀 Deployment Process
+
+### Automatic Deployments
+Both frontend and backend deploy automatically when you push to GitHub:
+
+1. **Make changes** to any files
+2. **Commit and push**:
+   ```bash
+   git add .
+   git commit -m "Describe your changes"
+   git push
+   ```
+3. **Deployments happen automatically**:
+   - **Frontend**: Netlify deploys in ~2-3 minutes
+   - **Backend**: Railway deploys in ~3-5 minutes
+
+### Deployment Status
+- **Frontend**: Check https://app.netlify.com deployments
+- **Backend**: Check Railway dashboard for deployment logs
+- **Health Check**: https://tabletalk-ai-backend-production.up.railway.app/health
+
+## 🔧 Common Development Tasks
+
+### Adding a New API Endpoint
 ```bash
-# Development mode
-npm run dev
-
-# Production mode
-npm start
+# 1. Add route in routes/contact.js
+# 2. Add validation in validation/contactValidation.js  
+# 3. Update tests in tests/contact.test.js
+# 4. Commit and push to deploy
 ```
 
-## 🔧 Environment Variables
-
-### Required Variables
+### Updating Frontend Styling
 ```bash
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=tabletalk_ai
-DB_USER=tabletalk_user
-DB_PASSWORD=your_secure_password
-
-# Email (required for notifications)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=noreply@tabletalk.ai
-SMTP_PASSWORD=your_app_password
-FROM_EMAIL=noreply@tabletalk.ai
-SALES_EMAIL=sales@tabletalk.ai
-
-# Application
-APP_URL=https://tabletalk.ai
-PORT=3000
-JWT_SECRET=your_jwt_secret_here
-SESSION_SECRET=your_session_secret_here
+# 1. Edit public/index.html (CSS is inline)
+# 2. Test locally by opening file in browser
+# 3. Commit and push to deploy to Netlify
 ```
 
-### Optional Variables
+### Adding Environment Variables
 ```bash
-# Production settings
-APP_ENV=production
-API_RATE_LIMIT=100
-CSRF_SECRET=your_csrf_secret
-
-# Monitoring
-SENTRY_DSN=your_sentry_dsn
-
-# External Services
-TWILIO_ACCOUNT_SID=your_twilio_sid
-TWILIO_AUTH_TOKEN=your_twilio_token
-DEMO_PHONE_NUMBER=+447777000000
-
-# Analytics
-GOOGLE_ANALYTICS_ID=GA-XXXXXXXXX
-MIXPANEL_TOKEN=your_mixpanel_token
+# 1. Add to env.template (for documentation)
+# 2. Add to Railway dashboard under Environment Variables
+# 3. Update config/database.js or server.js to use new variables
 ```
 
-## 📚 API Documentation
+## 🚨 Troubleshooting Common Issues
 
-### Contact Form Submission
-
-**POST** `/api/contact`
-
-Submit a new contact form with restaurant details.
-
-```json
-{
-  "name": "John Smith",
-  "email": "john@restaurant.com", 
-  "restaurant": "The Italian Place",
-  "phone": "+44 20 1234 5678",
-  "trial": true,
-  "consent_given": true
-}
+### CORS Errors
+**Problem**: Frontend can't connect to backend
+**Solution**: Add your domain to `middleware/security.js`:
+```javascript
+const allowedOrigins = [
+  'https://tablecallai.netlify.app',
+  'https://yourdomain.com', // Add new domains here
+  // ...
+];
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Thank you for your interest! We'll be in touch within 24 hours.",
-  "id": 123
-}
-```
+### Database Connection Errors
+**Problem**: Backend can't connect to database
+**Solution**: Check `DATABASE_URL` in Railway environment variables
 
-**Validation Rules:**
-- `name`: 2-100 characters, required
-- `email`: Valid email format, required
-- `restaurant`: 2-200 characters, required
-- `phone`: UK format (+44 or 07), required
-- `trial`: Boolean, optional (default: false)
-- `consent_given`: Boolean, optional (default: false)
+### Frontend Not Updating
+**Problem**: Netlify deployment failed
+**Solutions**:
+- Check Netlify deployment logs
+- Ensure `public/index.html` exists
+- Clear browser cache
 
-**Rate Limiting:** 3 requests per 15 minutes per IP
+### Backend API Errors
+**Problem**: API returning 500 errors
+**Solutions**:
+- Check Railway deployment logs
+- Test health endpoint: `/health`
+- Verify environment variables are set
 
-### Demo Call Tracking
+## 🛠️ Development Workflow
 
-**POST** `/api/contact/demo-call`
+### For Frontend Changes:
+1. Edit `public/index.html`
+2. Test locally (open in browser)
+3. Commit & push → auto-deploys to Netlify
 
-Track demo call interactions for analytics.
+### For Backend Changes:
+1. Edit relevant files (routes, models, etc.)
+2. Test locally with `npm run dev`
+3. Run tests with `npm test`
+4. Commit & push → auto-deploys to Railway
 
-```json
-{
-  "phone": "+44 7123 456789",
-  "timestamp": "2025-07-14T10:30:00Z",
-  "duration": 120,
-  "outcome": "interested"
-}
-```
+### For Database Changes:
+1. Update `database/schema.sql`
+2. Update migration script if needed
+3. Test locally with `npm run migrate`
+4. Deploy backend changes
 
-**Rate Limiting:** 10 requests per 5 minutes per IP
+## 📞 API Endpoints
 
-### Analytics (Protected)
+### Public Endpoints
+- `GET /health` - Health check
+- `POST /api/contact` - Submit contact form
 
-**GET** `/api/contact/analytics?days=30`
-
-Get contact form submission analytics.
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "date": "2025-07-14",
-      "total_submissions": 15,
-      "trial_requests": 8,
-      "conversions": 3
-    }
-  ],
-  "period": "30 days"
-}
-```
-
-### Admin Endpoints (Protected)
-
-- **GET** `/api/contact` - List all contacts with pagination
-- **GET** `/api/contact/:id` - Get specific contact details
-- **PUT** `/api/contact/:id/status` - Update contact status
-
-### Health Checks
-
-- **GET** `/health` - Basic health check
-- **GET** `/api/health` - Detailed health check with database status
+### Protected Endpoints (require authentication)
+- `GET /api/contact` - List all contacts
+- `GET /api/contact/analytics` - Get submission analytics
+- `PUT /api/contact/:id/status` - Update contact status
 
 ## 🔒 Security Features
 
-### Rate Limiting
-- Global: 100 requests per 15 minutes per IP
-- Contact form: 3 submissions per 15 minutes per IP
-- Demo calls: 10 requests per 5 minutes per IP
+- **CORS Protection**: Only allows requests from approved domains
+- **Rate Limiting**: Prevents API abuse
+- **Input Validation**: Sanitizes all user input
+- **CSRF Protection**: Prevents cross-site request forgery (production only)
+- **Security Headers**: Helmet.js for security headers
+- **Data Sanitization**: Removes potential XSS attacks
 
-### Input Protection
-- Joi validation schemas
-- Input sanitization (XSS prevention)
-- CSRF token protection (production)
-- SQL injection prevention (parameterized queries)
+## 📈 Monitoring & Analytics
 
-### Headers & CORS
-- Helmet.js security headers
-- CORS protection with whitelist
-- Content Security Policy
-- HSTS headers in production
+- **Health Checks**: `/health` and `/api/health` endpoints
+- **Error Tracking**: Sentry integration (if configured)
+- **Request Logging**: Morgan for HTTP request logs
+- **Database Analytics**: Built-in contact form analytics
 
-### Data Protection
-- Password-less architecture
-- IP address logging
-- User agent tracking
-- GDPR compliance features
+## 🏃‍♂️ Quick Start Commands
 
-## 📊 Database Schema
-
-### contact_submissions
-- `id` - Serial primary key
-- `name` - Contact name
-- `email` - Contact email
-- `restaurant_name` - Restaurant name
-- `phone` - Normalized phone number
-- `wants_trial` - Trial request boolean
-- `submitted_at` - Submission timestamp
-- `status` - Lead status (new/contacted/converted/rejected)
-- `notes` - Admin notes
-- `lead_source` - Traffic source
-- `consent_given` - GDPR consent
-- `data_retention_date` - Auto-calculated retention date
-- `deletion_requested` - GDPR deletion flag
-- `ip_address` - Client IP
-- `user_agent` - Client browser
-
-### Indexes
-- `idx_contact_submissions_email` - Email lookups
-- `idx_contact_submissions_submitted_at` - Date sorting
-- `idx_contact_submissions_status` - Status filtering
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run specific test file
-npm test -- contact.test.js
-```
-
-## 🚀 Deployment
-
-### Docker Deployment
-
-1. **Create Dockerfile** (included in project)
-```bash
-docker build -t tabletalk-ai-backend .
-docker run -p 3000:3000 --env-file .env tabletalk-ai-backend
-```
-
-2. **Docker Compose** (for local development)
-```yaml
-version: '3.8'
-services:
-  api:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - postgres
-  
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: tabletalk_ai
-      POSTGRES_USER: tabletalk_user
-      POSTGRES_PASSWORD: secure_password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-```
-
-### VPS Deployment
-
-1. **Server Setup**
-```bash
-# Ubuntu 22.04 LTS
-sudo apt update && sudo apt upgrade -y
-sudo apt install nodejs npm postgresql nginx certbot
-
-# Install PM2 for process management
-npm install -g pm2
-```
-
-2. **Application Deployment**
 ```bash
 # Clone repository
-git clone <repo-url> /var/www/tabletalk-ai
-cd /var/www/tabletalk-ai
+git clone https://github.com/StandGard/TableCall_Ai.git
+cd TableCall_Ai
 
-# Install dependencies
-npm ci --production
-
-# Setup environment
+# Backend setup
+npm install
 cp env.template .env
-nano .env
+# Edit .env with your database credentials
+npm run migrate -- --demo
+npm run dev
 
-# Run migrations
-npm run migrate
+# Frontend testing
+# Open public/index.html in browser
+# Or use: python3 -m http.server 8000
 
-# Start with PM2
-pm2 start ecosystem.config.js --env production
-pm2 save
-pm2 startup
+# Deploy changes
+git add .
+git commit -m "Your changes"
+git push
 ```
-
-3. **Nginx Configuration**
-```nginx
-server {
-    listen 80;
-    server_name api.tabletalk.ai;
-    
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-### Environment-Specific Settings
-
-**Development:**
-- CSRF disabled
-- Detailed error messages
-- Auto-restart on file changes
-- Debug logging enabled
-
-**Production:**
-- CSRF protection enabled
-- Generic error messages
-- Process monitoring with PM2
-- Compressed responses
-- Security headers enforced
-
-## 🔍 Monitoring
-
-### Health Checks
-- **Basic**: `GET /health` - Server status
-- **Detailed**: `GET /api/health` - Database + email status
-
-### Error Tracking
-- Sentry integration for error monitoring
-- Structured logging with request IDs
-- Performance metrics collection
-
-### Analytics
-- Contact form conversion rates
-- Lead source attribution
-- Trial request tracking
-- Response time monitoring
-
-## 🛠️ Maintenance
-
-### Backup
-```bash
-# Daily database backup
-pg_dump -h localhost -U tabletalk_user tabletalk_ai > backup_$(date +%Y%m%d).sql
-
-# Automated backup script
-0 2 * * * /home/deploy/scripts/backup_db.sh
-```
-
-### GDPR Compliance
-```bash
-# Clean up expired data (run monthly)
-node scripts/gdpr-cleanup.js
-
-# Export user data
-node scripts/export-user-data.js --email=user@example.com
-```
-
-### Log Rotation
-```bash
-# PM2 log rotation
-pm2 install pm2-logrotate
-pm2 set pm2-logrotate:max_size 10M
-pm2 set pm2-logrotate:retain 30
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the ISC License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Email: support@tabletalk.ai
-- Documentation: https://docs.tabletalk.ai
-- Issues: https://github.com/tabletalk-ai/backend/issues
 
 ---
 
-**TableTalk AI** - Never miss another reservation 📞✨ 
+## 🎓 What You Should Read Next
+
+**As a beginner, follow this order:**
+
+1. **Start Here**: Read this README.md (you're doing it! ✅)
+2. **Quick Setup**: Read `QUICKSTART.md` for step-by-step local setup
+3. **Deployment**: Read `DEPLOYMENT.md` for deployment details
+4. **Make Changes**: Use the "Development Workflow" section above
+5. **Troubleshooting**: Refer to "Common Issues" section when problems arise
+
+**Your development workflow is simple:**
+1. Make changes to files
+2. Test locally (if needed)  
+3. `git add . && git commit -m "description" && git push`
+4. Wait 2-5 minutes for auto-deployment ✨ 
