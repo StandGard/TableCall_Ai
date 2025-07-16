@@ -436,6 +436,34 @@
         const API_BASE_URL = 'https://tabletalk-ai-backend-production.up.railway.app';
         console.log('🔗 API Base URL:', API_BASE_URL);
 
+        // CSRF Token Management
+        let csrfToken = null;
+
+        // Fetch CSRF token from backend
+        async function fetchCSRFToken() {
+            try {
+                console.log('🔐 Fetching CSRF token...');
+                const response = await fetch(`${API_BASE_URL}/api/csrf-token`, {
+                    method: 'GET',
+                    credentials: 'include', // Include cookies for session
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    csrfToken = data.csrfToken;
+                    console.log('✅ CSRF token obtained successfully');
+                } else {
+                    console.warn('⚠️ Failed to fetch CSRF token, continuing without it');
+                }
+            } catch (error) {
+                console.warn('⚠️ CSRF token fetch error:', error);
+                console.log('📝 Form will submit without CSRF token (may work in development mode)');
+            }
+        }
+
+        // Fetch CSRF token when page loads
+        fetchCSRFToken();
+
         // Form submission handler
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -472,12 +500,24 @@
             
             console.log('📤 Sending data:', formData);
             
+            // Prepare headers
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            // Add CSRF token if available
+            if (csrfToken) {
+                headers['CSRF-Token'] = csrfToken;
+                console.log('🔐 Including CSRF token in request');
+            } else {
+                console.log('⚠️ No CSRF token available, submitting without it');
+            }
+            
             try {
                 const response = await fetch(`${API_BASE_URL}/api/contact`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: headers,
+                    credentials: 'include', // Include cookies for session
                     body: JSON.stringify(formData)
                 });
                 
@@ -520,6 +560,12 @@
                 formMessage.className = 'form-message error';
                 formMessage.textContent = '❌ Connection failed. API URL: ' + API_BASE_URL;
                 formMessage.style.display = 'block';
+                
+                // If it's a CSRF error, try to fetch a new token
+                if (error.message && error.message.includes('CSRF')) {
+                    console.log('🔄 CSRF error detected, fetching new token...');
+                    await fetchCSRFToken();
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Request Setup';
