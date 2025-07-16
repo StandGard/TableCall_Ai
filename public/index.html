@@ -351,21 +351,8 @@
     </footer>
 
     <script>
-        // 🚀 SMART API DETECTION FOR DEPLOYMENT
-        function getApiUrl() {
-            const hostname = window.location.hostname;
-            
-            // Production deployment (your actual domain)
-            if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-                // Same domain as frontend (if deployed together)
-                return window.location.origin;
-            }
-            
-            // Local development
-            return 'http://localhost:3000';
-        }
-
-        const API_BASE_URL = getApiUrl();
+        // 🚀 LIVE PRODUCTION API CONFIGURATION
+        const API_BASE_URL = 'https://tabletalk-ai-backend-production.up.railway.app';
         console.log('🔗 API Base URL:', API_BASE_URL);
 
         // Form submission handler
