@@ -1,31 +1,34 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Database configuration
-const dbConfig = {
-  // Production: Use DATABASE_URL if available (Render/Railway/Heroku style)
-  connectionString: process.env.DATABASE_URL,
-  
-  // Development: Use individual environment variables
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'tabletalk_ai',
-  user: process.env.DB_USER || 'tabletalk_user',
-  password: process.env.DB_PASSWORD,
-  
-  // Connection pool settings
-  max: 20, // maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // how long a client is allowed to remain idle
-  connectionTimeoutMillis: 2000, // how long to try connecting before timing out
-  
-  // SSL configuration for production
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-};
+// Create pool configuration
+let poolConfig;
 
-// Use connection string if available (production), otherwise use individual params
-const poolConfig = process.env.DATABASE_URL ? 
-  { connectionString: process.env.DATABASE_URL, ssl: dbConfig.ssl } : 
-  dbConfig;
+if (process.env.DATABASE_URL) {
+  // Production: Use DATABASE_URL (Railway, Render, Heroku style)
+  console.log('🔗 Using DATABASE_URL for production database connection');
+  poolConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }, // Required for most cloud databases
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  };
+} else {
+  // Development: Use individual environment variables
+  console.log('🏠 Using local database configuration');
+  poolConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'tabletalk_ai',
+    user: process.env.DB_USER || 'tabletalk_user',
+    password: process.env.DB_PASSWORD,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+    ssl: false
+  };
+}
 
 // Create connection pool
 const pool = new Pool(poolConfig);
@@ -41,10 +44,10 @@ const testConnection = async () => {
   try {
     const client = await pool.connect();
     const result = await client.query('SELECT NOW()');
-    console.log('Database connected successfully at:', result.rows[0].now);
+    console.log('✅ Database connected successfully at:', result.rows[0].now);
     client.release();
   } catch (err) {
-    console.error('Database connection error:', err);
+    console.error('❌ Database connection error:', err);
     throw err;
   }
 };

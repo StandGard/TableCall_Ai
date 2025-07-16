@@ -3,14 +3,28 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
 
-// Database configuration
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'tabletalk_ai',
-  user: process.env.DB_USER || 'tabletalk_user',
-  password: process.env.DB_PASSWORD,
-};
+// Database configuration - same logic as config/database.js
+let dbConfig;
+
+if (process.env.DATABASE_URL) {
+  // Production: Use DATABASE_URL (Railway, Render, Heroku style)
+  console.log('🔗 Migration using DATABASE_URL for production database connection');
+  dbConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }, // Required for most cloud databases
+  };
+} else {
+  // Development: Use individual environment variables
+  console.log('🏠 Migration using local database configuration');
+  dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'tabletalk_ai',
+    user: process.env.DB_USER || 'tabletalk_user',
+    password: process.env.DB_PASSWORD,
+    ssl: false
+  };
+}
 
 const pool = new Pool(dbConfig);
 
