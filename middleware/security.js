@@ -10,6 +10,7 @@ const corsOptions = {
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
+      'https://tablecallai.netlify.app', // Netlify frontend
       'https://tabletalk.ai',
       'https://www.tabletalk.ai',
       'http://localhost:3000',
